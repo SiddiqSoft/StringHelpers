@@ -44,7 +44,12 @@
 #include <ranges>
 #include <string>
 
-#if defined(_WIN64) || defined(WIN64) || defined(WIN32) || defined(_WIN32)
+
+#if defined(__linux__)
+#include <iconv.h>
+#elif defined(__unix__)
+#include <iconv.h>
+#elif defined(_WIN32)
 #include <Windows.h>
 #endif
 
@@ -54,6 +59,41 @@ namespace siddiqsoft
     /// @brief Conversion Functions for ascii to wide, utf8 to wide and vice-versa
     struct ConversionUtils
     {
+        template<typename S, typename D>
+        static auto convert_to(const S& src)
+        {
+#if defined(__linux__) || defined(__unix__)
+iconv_t conv = iconv_open("WCHAR_T", "UTF-8");
+    if (conv == (iconv_t)-1) {
+        throw std::runtime_error("iconv_open");
+    }
+#else
+#endif
+
+    // Set up conversion buffers
+    size_t in_bytes = src.size();
+    char* in_buf = const_cast<char*>(src.c_str());
+
+    std::vector<wchar_t> wide_buf(in_bytes + 1);
+    char* out_buf
+        = reinterpret_cast<char*>(wide_buf.data());
+    size_t out_bytes = wide_buf.size() * sizeof(wchar_t);
+
+    // Perform conversion
+    if (iconv(conv, &in_buf, &in_bytes, &out_buf,
+              &out_bytes)
+        == (size_t)-1) {
+        iconv_close(conv);
+        throw std::runtime_error("Conversion failure");
+    }
+
+    // Close iconv descriptor
+    iconv_close(conv);
+    // Create wide string
+    return std::wstring(wide_buf.data());
+        }
+        
+        
         /// @brief Convert given wide string to ascii encoded string
         /// @param src std::wstring input
         /// @return std::string with ascii encoding

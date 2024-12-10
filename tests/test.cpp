@@ -123,10 +123,14 @@ namespace siddiqsoft
         std::string sample_0 {"Banc\xe9"};
         std::string  sample_0rt {"Banc\xEF\xBF\xBD"};
         std::wstring sample_w {L"Bancé"};
-#elif defined(OSX)
+#elif defined(__unix__)
         std::string sample_0 {"Banc\xC3\xA9"};
-#else
+        std::string  sample_0rt {"Banc\xEF\xBF\xBD"};
+        std::wstring sample_w {L"Bancé"};
+#elif defined(__linux__)
         std::string sample_0 {"Banc\xEF\xBF\xBD"};
+        std::string  sample_0rt {"Banc\xEF\xBF\xBD"};
+        std::wstring sample_w {L"Bancé"};
 #endif
         auto intermediate = ConversionUtils::wideFromUtf8(sample_0);
         EXPECT_EQ(sample_w, intermediate);
@@ -141,10 +145,14 @@ namespace siddiqsoft
         std::string  sample_0 {"Hello, 世界"};
         std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
         std::wstring sample_w {L"Hello, 世界"};
-#elif defined(OSX)
+#elif defined(__unix__)
         std::string sample_0 {"Banc\xC3\xA9"};
-#else
+        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::wstring sample_w {L"Hello, 世界"};
+#elif defined(__linux__)
         std::string sample_0 {"Banc\xEF\xBF\xBD"};
+        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::wstring sample_w {L"Hello, 世界"};
 #endif
         auto intermediate = ConversionUtils::wideFromUtf8(sample_0);
         EXPECT_EQ(sample_w, intermediate);
