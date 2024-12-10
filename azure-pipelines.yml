@@ -62,13 +62,13 @@ stages:
         versionSpec: '6.1'
         checkLatest: true
 
-    - task: gitversion/setup@3.0.0
+    - task: gitversion/setup@4.0.0
       displayName: 'Install GitVersion..'
       inputs:
         versionSpec: '6.1.0'
         preferLatestVersion: true
 
-    - task: gitversion/execute@3.0.0
+    - task: gitversion/execute@4.0.0
       displayName: 'Determine Version..'
       name: version_step
       inputs:
@@ -161,13 +161,13 @@ stages:
         - Agent.OS -equals $(osName)
 
     steps:
-    - task: gitversion/setup@3.0.0
+    - task: gitversion/setup@4.0.0
       displayName: 'Install GitVersion..'
       inputs:
         versionSpec: '6.1.0'
         preferLatestVersion: true
 
-    - task: gitversion/execute@3.0.0
+    - task: gitversion/execute@4.0.0
       displayName: 'Determine Version..'
       name: version_step
       inputs:
