@@ -104,7 +104,7 @@ namespace siddiqsoft
         std::string  sample_n {"صديق"};
 
         try {
-            auto intermediate = ConversionUtils::asciiFromWide(sample);
+            auto         intermediate = ConversionUtils::asciiFromWide(sample);
             std::wstring roundTrip {ConversionUtils::wideFromAscii(intermediate)};
             EXPECT_EQ(sample, roundTrip);
         }
@@ -116,7 +116,13 @@ namespace siddiqsoft
 
     TEST(ConversionUtils, test3)
     {
-        std::string sample_0 {"Bancé"};
+#if defined(WIN32)
+        std::string sample_0 {"Banc\xE9"};
+#elif defined(OSX)
+        std::string sample_0 {"Banc\xC3\xA9"};
+#else
+        std::string sample_0 {"Banc\xEF\xBF\xBD"};
+#endif
         EXPECT_EQ(sample_0, ConversionUtils::utf8FromWide(ConversionUtils::wideFromUtf8(sample_0)));
         auto intermediate0 = ConversionUtils::wideFromUtf8(sample_0);
         std::cerr << "2: " << sample_0 << " -- ";
