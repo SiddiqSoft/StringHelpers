@@ -100,13 +100,16 @@ namespace siddiqsoft
 
     TEST(ConversionUtils, test2a_w)
     {
-        std::wstring sample {L"\\x635\\x62F\\x64A\\x642"};
+        std::wstring sample {L"صديق"};
+        std::wstring sample_w {L"\x635\x62F\x64A\x642"};
         std::string  sample_n {"صديق"};
+        std::wstring  sample_8 {L"\u0635\u062f\u064a\u0642"};
 
         try {
-            auto         intermediate = ConversionUtils::asciiFromWide(sample);
+            auto intermediate = ConversionUtils::asciiFromWide(sample);
+            EXPECT_EQ(sample_n, intermediate);
             std::wstring roundTrip {ConversionUtils::wideFromAscii(intermediate)};
-            EXPECT_EQ(sample, roundTrip);
+            EXPECT_EQ(sample_8, roundTrip);
         }
         catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
