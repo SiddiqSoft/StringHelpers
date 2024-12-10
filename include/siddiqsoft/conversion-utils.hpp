@@ -106,7 +106,7 @@ namespace siddiqsoft
                 destSize > 0)
             {
                 // Allocate appropriate buffer +1 for null-char
-                std::vector<char> destBuffer(static_cast<size_t>(destSize) + 1);
+                std::string destBuffer (static_cast<size_t>(destSize) + 1, '\0');
                 destSize = WideCharToMultiByte(CP_UTF8,
                                                0,
                                                src.c_str(),
@@ -115,7 +115,8 @@ namespace siddiqsoft
                                                static_cast<DWORD>(destSize),
                                                nullptr,
                                                nullptr);
-                return {destBuffer.data(), static_cast<size_t>(destSize)};
+                destBuffer.resize(destSize);
+                return destBuffer;
             }
 #else
             std::mbstate_t state = std::mbstate_t();
@@ -146,10 +147,11 @@ namespace siddiqsoft
                 destSize > 0)
             {
                 // Allocate appropriate buffer +1 for null-char
-                std::vector<wchar_t> destBuffer(static_cast<size_t>(destSize) + 1);
+                std::wstring destBuffer(static_cast<size_t>(destSize) + 1, L'\0');
                 destSize = MultiByteToWideChar(
                         CP_UTF8, 0, src.c_str(), static_cast<int>(src.length()), destBuffer.data(), static_cast<DWORD>(destSize));
-                return {destBuffer.data(), static_cast<size_t>(destSize)};
+                destBuffer.resize(destSize);
+                return destBuffer;
             }
 #else
             std::mbstate_t state = std::mbstate_t();

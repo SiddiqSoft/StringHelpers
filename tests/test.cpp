@@ -1,4 +1,4 @@
-﻿/*
+/*
     StringHelpers : Simple wide, narrow, utf8 conversion functions
 
     BSD 3-Clause License
@@ -102,13 +102,13 @@ namespace siddiqsoft
     {
         std::wstring sample {L"صديق"};
         std::wstring sample_w {L"\x635\x62F\x64A\x642"};
-        std::string  sample_n {"صديق"};
+        std::string  sample_n {"ØµØ¯ÙŠÙ‚"};
         std::wstring  sample_8 {L"\u0635\u062f\u064a\u0642"};
 
         try {
-            auto intermediate = ConversionUtils::asciiFromWide(sample);
+            auto intermediate = ConversionUtils::utf8FromWide(sample);
             EXPECT_EQ(sample_n, intermediate);
-            std::wstring roundTrip {ConversionUtils::wideFromAscii(intermediate)};
+            std::wstring roundTrip {ConversionUtils::wideFromUtf8(intermediate)};
             EXPECT_EQ(sample_8, roundTrip);
         }
         catch (const std::exception& ex) {
@@ -120,15 +120,35 @@ namespace siddiqsoft
     TEST(ConversionUtils, test3)
     {
 #if defined(WIN32)
-        std::string sample_0 {"Banc\xE9"};
+        std::string sample_0 {"Banc\xe9"};
+        std::string  sample_0rt {"Banc\xEF\xBF\xBD"};
+        std::wstring sample_w {L"Bancé"};
 #elif defined(OSX)
         std::string sample_0 {"Banc\xC3\xA9"};
 #else
         std::string sample_0 {"Banc\xEF\xBF\xBD"};
 #endif
-        EXPECT_EQ(sample_0, ConversionUtils::utf8FromWide(ConversionUtils::wideFromUtf8(sample_0)));
-        auto intermediate0 = ConversionUtils::wideFromUtf8(sample_0);
-        std::cerr << "2: " << sample_0 << " -- ";
-        std::wcerr << intermediate0 << std::endl;
+        auto intermediate = ConversionUtils::wideFromUtf8(sample_0);
+        EXPECT_EQ(sample_w, intermediate);
+        auto intermediate1 = ConversionUtils::utf8FromWide(intermediate);
+        EXPECT_EQ(sample_0rt, intermediate1);
+    }
+
+
+    TEST(ConversionUtils, test4)
+    {
+#if defined(WIN32)
+        std::string  sample_0 {"Hello, 世界"};
+        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::wstring sample_w {L"Hello, 世界"};
+#elif defined(OSX)
+        std::string sample_0 {"Banc\xC3\xA9"};
+#else
+        std::string sample_0 {"Banc\xEF\xBF\xBD"};
+#endif
+        auto intermediate = ConversionUtils::wideFromUtf8(sample_0);
+        EXPECT_EQ(sample_w, intermediate);
+        auto intermediate1 = ConversionUtils::utf8FromWide(intermediate);
+        EXPECT_EQ(sample_0rt, intermediate1);
     }
 } // namespace siddiqsoft
