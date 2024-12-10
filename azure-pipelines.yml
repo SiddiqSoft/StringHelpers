@@ -59,13 +59,13 @@ stages:
     - task: NuGetToolInstaller@1
       displayName: 'Install Nuget'
       inputs:
-        versionSpec: '>=6.0.0-0'
+        versionSpec: '6.1'
         checkLatest: true
 
     - task: gitversion/setup@3.0.0
       displayName: 'Install GitVersion..'
       inputs:
-        versionSpec: '6.x'
+        versionSpec: '6.1'
         preferLatestVersion: true
 
     - task: gitversion/execute@3.0.0
@@ -164,7 +164,7 @@ stages:
     - task: gitversion/setup@3.0.0
       displayName: 'Install GitVersion..'
       inputs:
-        versionSpec: '6.x'
+        versionSpec: '6.1'
         preferLatestVersion: true
 
     - task: gitversion/execute@3.0.0
@@ -177,7 +177,7 @@ stages:
     - task: NuGetToolInstaller@1
       displayName: 'Install Nuget'
       inputs:
-        versionSpec: '>=6.0.0-0'
+        versionSpec: '6.1'
         checkLatest: true
 
     - task: NuGetCommand@2
