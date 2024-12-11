@@ -122,7 +122,7 @@ namespace siddiqsoft
     TEST(ConversionUtils, test4)
     {
 #if defined(WIN32)
-        std::string  sample_0 {"Hello, 世界"};
+        std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
         std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
         std::wstring sample_w {L"Hello, 世界"};
 #elif defined(__unix__) || defined(__APPLE__)
@@ -130,18 +130,13 @@ namespace siddiqsoft
         std::string  sample_0rt {"Bancé"};
         std::wstring sample_w {L"Bancé"};
 #elif defined(__linux__)
-        std::string  sample_0 {"Banc\xEF\xBF\xBD"};
+        std::string  sample_0 {"Hello, 世界"};
         std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
         std::wstring sample_w {L"Hello, 世界"};
 #endif
-        std::cerr << "sample_0      : " << sample_0 << std::endl;
         auto intermediate = ConversionUtils::convert_to<char, wchar_t>(sample_0);
-        std::wcerr << "sample_w      : " << sample_w << std::endl;
-        std::wcerr << "intermediate  : " << intermediate << std::endl;
         EXPECT_EQ(sample_w, intermediate);
         auto intermediate1 = ConversionUtils::convert_to<wchar_t, char>(intermediate);
-        std::cerr << "intermediate1 : " << intermediate1 << std::endl;
-        std::cerr << "sample_0rt    : " << sample_0rt << std::endl;
         EXPECT_EQ(sample_0rt, intermediate1);
     }
 } // namespace siddiqsoft
