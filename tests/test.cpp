@@ -1,4 +1,4 @@
-/*
+﻿/*
     StringHelpers : Simple wide, narrow, utf8 conversion functions
 
     BSD 3-Clause License
@@ -68,9 +68,9 @@ namespace siddiqsoft
         std::string  sample_n {"This is a test."};
 
         try {
-            auto intermediate = ConversionUtils::convert_to<wchar_t,char>(sample);
+            auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample);
             EXPECT_EQ(sample_n, intermediate);
-            std::wstring roundTrip {ConversionUtils::convert_to<char,wchar_t>(intermediate)};
+            std::wstring roundTrip {ConversionUtils::convert_to<char, wchar_t>(intermediate)};
             std::wcerr << L"sample    : .." << sample << L".. - size: " << sample.size() << std::endl;
             std::cerr << "sample_n  : .." << sample_n << ".. - size: " << sample_n.size() << std::endl;
             std::wcerr << L"roundTrip : .." << roundTrip << L".. - size: " << roundTrip.size() << std::endl;
@@ -101,13 +101,14 @@ namespace siddiqsoft
     TEST(ConversionUtils, test2a_w)
     {
         std::wstring sample {L"صديق"};
-        std::wstring sample_w {L"\x635\x62F\x64A\x642"};
-        std::string  sample_n {"ØµØ¯ÙŠÙ‚"};
-        std::wstring sample_8 {L"\u0635\u062f\u064a\u0642"};
+        // std::wstring sample_w {L"\x635\x62F\x64A\x642"};
+        // std::string  sample_n {"ØµØ¯ÙŠÙ‚"};
+        std::string sample_n {"\xD8\xB5\xD8\xAF\xD9\x8A\xD9\x82"};
+        // std::wstring sample_8 {L"\u0635\u062f\u064a\u0642"};
 
         try {
             auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample);
-            // EXPECT_EQ(sample_n, intermediate);
+            EXPECT_EQ(sample_n, intermediate);
             auto roundTrip = ConversionUtils::convert_to<char, wchar_t>(intermediate);
             EXPECT_EQ(sample, roundTrip);
         }
@@ -124,7 +125,7 @@ namespace siddiqsoft
         std::string  sample_0 {"Hello, 世界"};
         std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
         std::wstring sample_w {L"Hello, 世界"};
-#elif defined(__unix__)
+#elif defined(__unix__) || defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
         std::string  sample_0rt {"Bancé"};
         std::wstring sample_w {L"Bancé"};

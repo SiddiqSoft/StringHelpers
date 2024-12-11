@@ -35,29 +35,17 @@
 
 #pragma once
 
-#include <codecvt>
-#include <locale>
-#include <memory>
-#include <type_traits>
 #ifndef CONVERSION_UTILS_HPP
 #define CONVERSION_UTILS_HPP
 
-#include <chrono>
-#include <concepts>
-#include <format>
-#include <ranges>
-#include <string>
-#include <vector>
-#include <exception>
-#include <utility>
+#include <codecvt>
+#include <locale>
 
-#if defined(__linux__)
-#include <iconv.h>
-#elif defined(__unix__)
-#include <iconv.h>
-#elif defined(_WIN32)
-#include <Windows.h>
-#endif
+#include <type_traits>
+
+#include <concepts>
+#include <string>
+
 
 /// @brief SiddiqSoft
 namespace siddiqsoft
@@ -72,12 +60,14 @@ namespace siddiqsoft
         static auto convert_to(const std::basic_string<S>& src) -> std::basic_string<D>
         {
             std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+
             if constexpr (std::is_same_v<S, wchar_t>) {
                 return converter.to_bytes(src);
             }
             else if constexpr (std::is_same_v<S, char>) {
                 return converter.from_bytes(src);
             }
+            
             // We should not end up here!
             return std::basic_string<D> {};
         }
