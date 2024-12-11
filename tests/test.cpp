@@ -125,7 +125,7 @@ namespace siddiqsoft
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
         std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
         std::wstring sample_w {L"Hello, 世界"};
-#elif defined(__unix__) || defined(__APPLE__)
+#elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
         std::string  sample_0rt {"Bancé"};
         std::wstring sample_w {L"Bancé"};
