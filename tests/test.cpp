@@ -135,4 +135,44 @@ namespace siddiqsoft
         auto intermediate1 = ConversionUtils::convert_to<wchar_t, char>(intermediate);
         EXPECT_EQ(sample_0rt, intermediate1);
     }
+
+
+    TEST(ConversionUtils, test5_n)
+    {
+#if defined(WIN32)
+        std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
+        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::wstring sample_w {L"Hello, 世界"};
+#elif defined(__APPLE__)
+        std::string  sample_0 {"Banc\xC3\xA9"};
+        std::string  sample_0rt {"Bancé"};
+        std::wstring sample_w {L"Bancé"};
+#elif defined(__linux__)
+        std::string  sample_0 {"Hello, 世界"};
+        std::string  sample_0rt {"Hello, \xE4\xB8\x96\xE7\x95\x8C"};
+        std::wstring sample_w {L"Hello, 世界"};
+#endif
+        std::string result= ConversionUtils::convert_to<char,char>(sample_0);
+        EXPECT_EQ(sample_0, result);
+    }
+
+
+    TEST(ConversionUtils, test5_w)
+    {
+#if defined(WIN32)
+        std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
+        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::wstring sample_w {L"Hello, 世界"};
+#elif defined(__APPLE__)
+        std::string  sample_0 {"Banc\xC3\xA9"};
+        std::string  sample_0rt {"Bancé"};
+        std::wstring sample_w {L"Bancé"};
+#elif defined(__linux__)
+        std::string  sample_0 {"Hello, 世界"};
+        std::string  sample_0rt {"Hello, \xE4\xB8\x96\xE7\x95\x8C"};
+        std::wstring sample_w {L"Hello, 世界"};
+#endif
+        std::wstring result= ConversionUtils::convert_to<wchar_t,wchar_t>(sample_w);
+        EXPECT_EQ(sample_w, result);
+    }
 } // namespace siddiqsoft

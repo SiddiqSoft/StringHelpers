@@ -38,14 +38,19 @@
 #ifndef CONVERSION_UTILS_HPP
 #define CONVERSION_UTILS_HPP
 
-#include <codecvt>
-#include <locale>
 
 #include <type_traits>
 
 #include <concepts>
 #include <string>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+#include <codecvt>
+#include <locale>
 
 /// @brief SiddiqSoft
 namespace siddiqsoft
@@ -59,19 +64,27 @@ namespace siddiqsoft
                     requires { std::same_as<S, wchar_t>&& std::same_as<D, char>; })
         static auto convert_to(const std::basic_string<S>& src) -> std::basic_string<D>
         {
-            std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-
-            if constexpr (std::is_same_v<S, wchar_t>) {
+            if constexpr ((std::is_same_v<S, char> && std::is_same_v<D, char>) ||
+                          (std::is_same_v<S, wchar_t> && std::is_same_v<D, wchar_t>))
+            {
+                return src;
+            }
+            else if constexpr (std::is_same_v<S, wchar_t>) {
+                std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
                 return converter.to_bytes(src);
             }
             else if constexpr (std::is_same_v<S, char>) {
+                std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
                 return converter.from_bytes(src);
             }
-            
+
             // We should not end up here!
             return std::basic_string<D> {};
         }
     };
 } // namespace siddiqsoft
+
+#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 #endif
