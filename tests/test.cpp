@@ -95,11 +95,12 @@ namespace siddiqsoft
 
     TEST(ConversionUtils, test2a_w)
     {
+        // The reason we do not get sample == sample is due to the idiosyncracy of the
+        // various platforms and their encoding scheme. Notably Apple and Windows/Linux differ
+        // in their textual encoding.
+        // In order to prevent constant mutation by git we're using the raw form.
         std::wstring sample {L"صديق"};
-        // std::wstring sample_w {L"\x635\x62F\x64A\x642"};
-        // std::string  sample_n {"ØµØ¯ÙŠÙ‚"};
         std::string sample_n {"\xD8\xB5\xD8\xAF\xD9\x8A\xD9\x82"};
-        // std::wstring sample_8 {L"\u0635\u062f\u064a\u0642"};
 
         try {
             auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample);

@@ -1,11 +1,11 @@
-Azure C++ Utils : Azure REST API Helpers for Modern C++
+StringHelpers : C++ String Conversion Utilities
 -------------------------------------------
 <!-- badges -->
-[![Build Status](https://dev.azure.com/siddiqsoft/siddiqsoft/_apis/build/status/SiddiqSoft.AzureCppUtils?branchName=main)](https://dev.azure.com/siddiqsoft/siddiqsoft/_build/latest?definitionId=16&branchName=main)
-![](https://img.shields.io/nuget/v/SiddiqSoft.AzureCppUtils)
-![](https://img.shields.io/github/v/tag/SiddiqSoft/AzureCppUtils)
-![](https://img.shields.io/azure-devops/tests/siddiqsoft/siddiqsoft/16)
-![](https://img.shields.io/azure-devops/coverage/siddiqsoft/siddiqsoft/16)
+[![Build Status](https://dev.azure.com/siddiqsoft/siddiqsoft/_apis/build/status/SiddiqSoft.StringHelpers?branchName=main)](https://dev.azure.com/siddiqsoft/siddiqsoft/_build/latest?definitionId=26&branchName=main)
+![](https://img.shields.io/nuget/v/SiddiqSoft.StringHelpers)
+![](https://img.shields.io/github/v/tag/SiddiqSoft/StringHelpers)
+![](https://img.shields.io/azure-devops/tests/siddiqsoft/siddiqsoft/26)
+![](https://img.shields.io/azure-devops/coverage/siddiqsoft/siddiqsoft/26)
 <!-- end badges -->
 
 # Objective
@@ -17,31 +17,39 @@ Azure C++ Utils : Azure REST API Helpers for Modern C++
   - No support for Linux/Darwin!
 
 ## Usage
-- Use the nuget [SiddiqSoft.AzureCppUtils](https://www.nuget.org/packages/SiddiqSoft.AzureCppUtils/)
+- Use the nuget [SiddiqSoft.StringHelpers](https://www.nuget.org/packages/SiddiqSoft.StringHelpers/)
 - Use the CPM in your CMakeLists file.
 
 ```cmake
 ..
 .. # import the CPM.cmake module and activate..
 ..
-CPMAddModule("gh:siddiqsoft/AzureCppUtils#1.3.1.1")
+CPMAddModule("gh:siddiqsoft/StringHelpers#1.0.0")
 ..
 ..
-target_link_libraries(your-project PRIVATE AzureCppUtils::AzureCppUtils)
+target_link_libraries(your-project PRIVATE StringHelpers::StringHelpers)
 ```
 
 # Features 
 
-- DateUtils (`date-utils.hpp`)
-  - RFC7231 and RFC1123
-  - ISO8601
 - ConversionUtils (`conversion-utils.hpp`)
-  - utf8fromWide, wideFromUtf8, asciiFromWide and wideFromAscii
-- Bas64Utils (`base64-utils.hpp`)
-  - encode, decode
-- EncryptionUtils (`encryption-utils.hpp`)
-  - MD5, HMAC, JWTSHA256, SASToken, CosmosToken  
+  
+  ```cpp
+  template<typename S, typename D>
+  auto convert_to<char,wchar_t>(const std::basic_string<T>& src) -> std::basic_string<D>
+  {
+     ...
+    return std::basic_string<D>{};
+  }
+  ```
+
+  - `convert_to<char,wchar_t>(const std::string& src)`
+    - Convert from std::string to std::wstring (using UTF-8 encoding)
+  - `convert_to<wchar_t,char>(const std::wstring& src)`
+    - Convert from std::wstring to std::string (UTF-8 encodes the contents).
+
+> Use this library until C++26 is prevalent and the compiler vendors remove the `codecvt` library--not simply deprecation warnings.
 
 <p align="right">
-&copy; 2021 Siddiq Software LLC. All rights reserved.
+&copy; 2024 Siddiq Software LLC. All rights reserved.
 </p>
