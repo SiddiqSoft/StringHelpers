@@ -52,8 +52,6 @@ namespace siddiqsoft
             auto intermediate = ConversionUtils::convert_to<char, wchar_t>(sample);
             // EXPECT_EQ(sample_w, intermediate);
             auto roundTrip = ConversionUtils::convert_to<wchar_t, char>(intermediate);
-            std::clog << "sample    : " << sample << " - size: " << sample.size() << std::endl;
-            std::clog << "roundTrip : " << roundTrip << " - size: " << roundTrip.size() << std::endl;
             EXPECT_EQ(sample, roundTrip);
         }
         catch (const std::exception& ex) {
@@ -71,9 +69,6 @@ namespace siddiqsoft
             auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample);
             EXPECT_EQ(sample_n, intermediate);
             std::wstring roundTrip {ConversionUtils::convert_to<char, wchar_t>(intermediate)};
-            std::wcerr << L"sample    : .." << sample << L".. - size: " << sample.size() << std::endl;
-            std::cerr << "sample_n  : .." << sample_n << ".. - size: " << sample_n.size() << std::endl;
-            std::wcerr << L"roundTrip : .." << roundTrip << L".. - size: " << roundTrip.size() << std::endl;
             EXPECT_EQ(sample, roundTrip);
         }
         catch (const std::exception& ex) {
@@ -131,7 +126,7 @@ namespace siddiqsoft
         std::wstring sample_w {L"Bancé"};
 #elif defined(__linux__)
         std::string  sample_0 {"Hello, 世界"};
-        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::string  sample_0rt {"Hello, \xE4\xB8\x96\xE7\x95\x8C"};
         std::wstring sample_w {L"Hello, 世界"};
 #endif
         auto intermediate = ConversionUtils::convert_to<char, wchar_t>(sample_0);
