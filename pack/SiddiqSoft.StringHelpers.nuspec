@@ -8,12 +8,12 @@
 	-->
 	<metadata>
 		<!-- required: -->
-		<id>SiddiqSoft.AzureCppUtils</id>
+		<id>SiddiqSoft.StringHelpers</id>
 		<version>$VERSION$</version>
 		<authors>SiddiqSoft</authors>
-		<description>Azure REST API Helpers for Modern C++. Featuring helper functions for date-time, encryption tokens for Azure REST API as a single header-only package and native Win32 libraries.</description>
-		<tags>cpp20 base64 SAS JWT HMAC REST HTTP header-only native nativepackage cpp</tags>
-		<projectUrl>https://github.com/SiddiqSoft/AzureCppUtils</projectUrl>
+		<description>String Conversion Utilities</description>
+		<tags>cpp20 string conversion utf8 wstring header-only native nativepackage cpp</tags>
+		<projectUrl>https://github.com/SiddiqSoft/StringHelpers</projectUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<license type="expression">BSD-3-Clause</license>
     <icon>docs\Siddiq-Software-Avatar.png</icon>
@@ -22,7 +22,6 @@
 		<copyright>Copyright (c) 2021 Siddiq Software LLC</copyright>
 		<!-- Dependencies -->
 		<dependencies>
-			<dependency id="SiddiqSoft.RunOnEnd" version="1.3.1"/>
 		</dependencies>
 	</metadata>
 
@@ -39,6 +38,6 @@
 		<file src="..\README.md" target="docs\" />
     
 		<!-- MSBuild .targets files -->
-		<file src="SiddiqSoft.AzureCppUtils.targets" target="build\native" />
+		<file src="SiddiqSoft.StringHelpers.targets" target="build\native" />
 	</files>
 </package>
