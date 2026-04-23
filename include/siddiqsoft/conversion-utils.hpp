@@ -26,7 +26,7 @@
    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, d_, OR PROFITS; OR BUSINESS
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
@@ -60,8 +60,10 @@ namespace siddiqsoft
     {
         template <typename S = char, typename D = wchar_t>
             requires(
-                    requires { std::same_as<S, char>&& std::same_as<D, wchar_t>; } ||
-                    requires { std::same_as<S, wchar_t>&& std::same_as<D, char>; })
+                    (std::same_as<S, char> && std::same_as<D, wchar_t>) ||
+                    (std::same_as<S, wchar_t> && std::same_as<D, char>) ||
+                    (std::same_as<S, char> && std::same_as<D, char>) ||
+                    (std::same_as<S, wchar_t> && std::same_as<D, wchar_t>))
         static auto convert_to(const std::basic_string<S>& src) -> std::basic_string<D>
         {
             if constexpr ((std::is_same_v<S, char> && std::is_same_v<D, char>) ||

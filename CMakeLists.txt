@@ -19,7 +19,7 @@ include(pack/CMakeCommonHelpers.cmake)
 project(StringHelpers
         VERSION         "${CURRENT_PROJECT_VERSION}"
         LANGUAGES       CXX
-        HOMEPAGE_URL    "%%myurl%%"
+        HOMEPAGE_URL    "https://github.com/SiddiqSoft/StringHelpers"
         DESCRIPTION     "String Helpers. wide, narrow, utf8")
 
 

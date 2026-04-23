@@ -11,7 +11,7 @@ if(${${PROJECT_NAME}_BUILD_TESTS})
                     ${PROJECT_SOURCE_DIR}/tests/test.cpp)
 
     # Dependencies
-    cpmaddpackage("gh:google/googletest#v1.15.2")
+    cpmaddpackage("gh:google/googletest#v1.17.0")
     target_link_libraries(${TESTPROJ} PRIVATE GTest::gtest_main)
 
 
