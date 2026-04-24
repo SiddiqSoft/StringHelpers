@@ -1,4 +1,4 @@
-﻿/*
+/*
     StringHelpers : Simple wide, narrow, utf8 conversion functions
 
     BSD 3-Clause License
@@ -119,7 +119,7 @@ namespace siddiqsoft
     {
 #if defined(WIN32)
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
-        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::string  sample_0rt {"Hello, ä¸\x96ç\x95\x8c"};
         std::wstring sample_w {L"Hello, 世界"};
 #elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
@@ -141,7 +141,7 @@ namespace siddiqsoft
     {
 #if defined(WIN32)
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
-        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::string  sample_0rt {"Hello, ä¸\x96ç\x95\x8c"};
         std::wstring sample_w {L"Hello, 世界"};
 #elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
@@ -161,7 +161,7 @@ namespace siddiqsoft
     {
 #if defined(WIN32)
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
-        std::string  sample_0rt {"Hello, ä¸–ç•Œ"};
+        std::string  sample_0rt {"Hello, ä¸\x96ç\x95\x8c"};
         std::wstring sample_w {L"Hello, 世界"};
 #elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
@@ -175,4 +175,303 @@ namespace siddiqsoft
         std::wstring result= ConversionUtils::convert_to<wchar_t,wchar_t>(sample_w);
         EXPECT_EQ(sample_w, result);
     }
+
+
+    // =========================================================================
+    // Empty string tests - cover all four template instantiation paths
+    // =========================================================================
+
+    TEST(ConversionUtils, empty_char_to_wchar)
+    {
+        std::string  src;
+        std::wstring result = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_TRUE(result.empty());
+    }
+
+    TEST(ConversionUtils, empty_wchar_to_char)
+    {
+        std::wstring src;
+        std::string  result = ConversionUtils::convert_to<wchar_t, char>(src);
+        EXPECT_TRUE(result.empty());
+    }
+
+    TEST(ConversionUtils, empty_char_to_char)
+    {
+        std::string src;
+        std::string result = ConversionUtils::convert_to<char, char>(src);
+        EXPECT_TRUE(result.empty());
+    }
+
+    TEST(ConversionUtils, empty_wchar_to_wchar)
+    {
+        std::wstring src;
+        std::wstring result = ConversionUtils::convert_to<wchar_t, wchar_t>(src);
+        EXPECT_TRUE(result.empty());
+    }
+
+
+    // =========================================================================
+    // Single character tests
+    // =========================================================================
+
+    TEST(ConversionUtils, single_ascii_char_to_wchar)
+    {
+        std::string  src {"A"};
+        std::wstring expected {L"A"};
+        auto         result = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_EQ(expected, result);
+    }
+
+    TEST(ConversionUtils, single_ascii_wchar_to_char)
+    {
+        std::wstring src {L"A"};
+        std::string  expected {"A"};
+        auto         result = ConversionUtils::convert_to<wchar_t, char>(src);
+        EXPECT_EQ(expected, result);
+    }
+
+    TEST(ConversionUtils, single_ascii_char_to_char)
+    {
+        std::string src {"Z"};
+        auto        result = ConversionUtils::convert_to<char, char>(src);
+        EXPECT_EQ(src, result);
+    }
+
+    TEST(ConversionUtils, single_ascii_wchar_to_wchar)
+    {
+        std::wstring src {L"Z"};
+        auto         result = ConversionUtils::convert_to<wchar_t, wchar_t>(src);
+        EXPECT_EQ(src, result);
+    }
+
+
+    // =========================================================================
+    // Pure ASCII round-trip
+    // =========================================================================
+
+    TEST(ConversionUtils, ascii_roundtrip_narrow_wide_narrow)
+    {
+        std::string src {"The quick brown fox jumps over the lazy dog."};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    TEST(ConversionUtils, ascii_roundtrip_wide_narrow_wide)
+    {
+        std::wstring src {L"The quick brown fox jumps over the lazy dog."};
+        auto         narrow = ConversionUtils::convert_to<wchar_t, char>(src);
+        auto         wide   = ConversionUtils::convert_to<char, wchar_t>(narrow);
+        EXPECT_EQ(src, wide);
+    }
+
+
+    // =========================================================================
+    // Strings with whitespace / special ASCII characters
+    // =========================================================================
+
+    TEST(ConversionUtils, whitespace_chars_char_to_wchar)
+    {
+        std::string  src {"line1\nline2\ttab\r\n"};
+        std::wstring expected {L"line1\nline2\ttab\r\n"};
+        auto         result = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_EQ(expected, result);
+    }
+
+    TEST(ConversionUtils, whitespace_chars_wchar_to_char)
+    {
+        std::wstring src {L"line1\nline2\ttab\r\n"};
+        std::string  expected {"line1\nline2\ttab\r\n"};
+        auto         result = ConversionUtils::convert_to<wchar_t, char>(src);
+        EXPECT_EQ(expected, result);
+    }
+
+
+    // =========================================================================
+    // UTF-8 multi-byte sequences of varying lengths
+    // =========================================================================
+
+    // 2-byte UTF-8: Latin characters with diacritics (e-acute = U+00E9)
+    TEST(ConversionUtils, utf8_2byte_roundtrip)
+    {
+        std::string src {"\xC3\xA9"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(1u, wide.size());
+    }
+
+    // 3-byte UTF-8: CJK character (U+4E16)
+    TEST(ConversionUtils, utf8_3byte_roundtrip)
+    {
+        std::string src {"\xE4\xB8\x96"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(1u, wide.size());
+    }
+
+    // 4-byte UTF-8: Emoji (U+1F600)
+    TEST(ConversionUtils, utf8_4byte_roundtrip)
+    {
+        std::string src {"\xF0\x9F\x98\x80"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Mixed multi-byte: 1-byte + 2-byte + 3-byte + 4-byte
+    TEST(ConversionUtils, utf8_mixed_multibyte_roundtrip)
+    {
+        std::string src {"A\xC3\xA9\xE4\xB8\x96\xF0\x9F\x98\x80"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+
+    // =========================================================================
+    // Longer strings to exercise buffer handling
+    // =========================================================================
+
+    TEST(ConversionUtils, long_ascii_roundtrip)
+    {
+        std::string src(10000, 'x');
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(10000u, wide.size());
+    }
+
+    TEST(ConversionUtils, long_unicode_roundtrip)
+    {
+        std::string unit {"\xE4\xB8\x96"};
+        std::string src;
+        src.reserve(3000);
+        for (int i = 0; i < 1000; ++i) src += unit;
+
+        auto wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(1000u, wide.size());
+    }
+
+
+    // =========================================================================
+    // Identity conversion preserves content exactly
+    // =========================================================================
+
+    TEST(ConversionUtils, identity_char_preserves_content)
+    {
+        std::string src {"Hello\xC3\xA9World"};
+        auto        result = ConversionUtils::convert_to<char, char>(src);
+        EXPECT_EQ(src, result);
+        EXPECT_EQ(src.size(), result.size());
+    }
+
+    TEST(ConversionUtils, identity_wchar_preserves_content)
+    {
+        std::wstring src {L"Hello\x00E9World"};
+        auto         result = ConversionUtils::convert_to<wchar_t, wchar_t>(src);
+        EXPECT_EQ(src, result);
+        EXPECT_EQ(src.size(), result.size());
+    }
+
+
+    // =========================================================================
+    // Numeric and punctuation characters
+    // =========================================================================
+
+    TEST(ConversionUtils, digits_and_punctuation_roundtrip)
+    {
+        std::string src {"0123456789 !@#$%^&*()_+-=[]{}|;':\",./<>?"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+
+    // =========================================================================
+    // Various scripts round-trip
+    // =========================================================================
+
+    TEST(ConversionUtils, cyrillic_roundtrip)
+    {
+        std::string src {"\xD0\x9F\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    TEST(ConversionUtils, japanese_roundtrip)
+    {
+        std::string src {"\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    TEST(ConversionUtils, korean_roundtrip)
+    {
+        std::string src {"\xED\x95\x9C\xEA\xB5\xAD\xEC\x96\xB4"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    TEST(ConversionUtils, thai_roundtrip)
+    {
+        std::string src {"\xE0\xB8\xAA\xE0\xB8\xA7\xE0\xB8\xB1\xE0\xB8\xAA\xE0\xB8\x94\xE0\xB8\xB5"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+
+    // =========================================================================
+    // Wide-originated conversions (start from wchar_t literals)
+    // =========================================================================
+
+    TEST(ConversionUtils, wide_latin_extended_to_narrow_roundtrip)
+    {
+        std::wstring src {L"\x00FC\x00F6\x00E4"};
+        auto         narrow = ConversionUtils::convert_to<wchar_t, char>(src);
+        auto         wide   = ConversionUtils::convert_to<char, wchar_t>(narrow);
+        EXPECT_EQ(src, wide);
+    }
+
+    TEST(ConversionUtils, wide_cjk_to_narrow_roundtrip)
+    {
+        std::wstring src {L"\x4E16\x754C"};
+        auto         narrow = ConversionUtils::convert_to<wchar_t, char>(src);
+        auto         wide   = ConversionUtils::convert_to<char, wchar_t>(narrow);
+        EXPECT_EQ(src, wide);
+    }
+
+
+    // =========================================================================
+    // Strings with spaces only
+    // =========================================================================
+
+    TEST(ConversionUtils, spaces_only_roundtrip)
+    {
+        std::string src {"     "};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(5u, wide.size());
+    }
+
+
+    // =========================================================================
+    // Default template parameters (char -> wchar_t)
+    // =========================================================================
+
+    TEST(ConversionUtils, default_template_params)
+    {
+        std::string src {"hello"};
+        auto result = ConversionUtils::convert_to(src);
+        EXPECT_EQ(L"hello", result);
+    }
+
 } // namespace siddiqsoft
