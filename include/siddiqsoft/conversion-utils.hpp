@@ -79,10 +79,12 @@ namespace siddiqsoft
 #if defined(_WIN32) || defined(WIN32)
                 if (src.empty()) return std::string{};
                 // Convert wide (UTF-16 on Windows) to UTF-8
+                // First call: get the required buffer size (not including null terminator)
                 int size_needed = WideCharToMultiByte(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), nullptr, 0, nullptr, nullptr);
                 if (size_needed <= 0) return std::string{};
                 std::string result;
                 result.resize(size_needed);
+                // Second call: perform the actual conversion
                 WideCharToMultiByte(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), result.data(), size_needed, nullptr, nullptr);
                 return result;
 #else
@@ -94,10 +96,12 @@ namespace siddiqsoft
 #if defined(_WIN32) || defined(WIN32)
                 if (src.empty()) return std::wstring{};
                 // Convert UTF-8 to wide (UTF-16 on Windows)
+                // First call: get the required buffer size (not including null terminator)
                 int size_needed = MultiByteToWideChar(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), nullptr, 0);
                 if (size_needed <= 0) return std::wstring{};
                 std::wstring result;
                 result.resize(size_needed);
+                // Second call: perform the actual conversion
                 MultiByteToWideChar(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), result.data(), size_needed);
                 return result;
 #else
