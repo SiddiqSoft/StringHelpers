@@ -62,11 +62,11 @@ stages:
         versionSpec: '6.1'
         checkLatest: true
 
-    - task: gitversion/setup@3
+    - task: gitversion-setup@4
       inputs:
         versionSpec: '6.0'
 
-    - task: gitversion/execute@3
+    - task: gitversion-execute@4
       displayName: 'Determine Version..'
       name: version_step
       inputs:
@@ -121,11 +121,12 @@ stages:
       continueOnError: false
       condition: succeeded()
 
+    # Only run on Linux x64 machines
     - task: PublishCodeCoverageResults@2
       displayName: 'Publish Coverage Results (Linux builds)'
       inputs:
         summaryFileLocation: '$(System.DefaultWorkingDirectory)/build/$(cmake.preset)/tests/results/coverage.*'
-      condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'))
+      condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Linux'), startsWith(variables['Agent.OSArchitecture'], 'X64'))
 
 ################################## STAGE ####################################
 # STAGE: Pack_n_Publish                                                     #
@@ -159,13 +160,13 @@ stages:
         - Agent.OS -equals $(osName)
 
     steps:
-    - task: gitversion/setup@3
+    - task: gitversion-setup@4
       displayName: 'Install GitVersion..'
       inputs:
         versionSpec: '6.0'
         preferLatestVersion: true
 
-    - task: gitversion/execute@3
+    - task: gitversion-execute@4
       displayName: 'Determine Version..'
       name: version_step
       inputs:

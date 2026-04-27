@@ -52,6 +52,10 @@
 #include <codecvt>
 #include <locale>
 
+#if defined(_WIN32) || defined(WIN32)
+#  include <windows.h>
+#endif
+
 /// @brief SiddiqSoft
 namespace siddiqsoft
 {
@@ -72,12 +76,34 @@ namespace siddiqsoft
                 return src;
             }
             else if constexpr (std::is_same_v<S, wchar_t>) {
+#if defined(_WIN32) || defined(WIN32)
+                if (src.empty()) return std::string{};
+                // Convert wide (UTF-16 on Windows) to UTF-8
+                int size_needed = WideCharToMultiByte(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), nullptr, 0, nullptr, nullptr);
+                if (size_needed <= 0) return std::string{};
+                std::string result;
+                result.resize(size_needed);
+                WideCharToMultiByte(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), result.data(), size_needed, nullptr, nullptr);
+                return result;
+#else
                 std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
                 return converter.to_bytes(src);
+#endif
             }
             else if constexpr (std::is_same_v<S, char>) {
+#if defined(_WIN32) || defined(WIN32)
+                if (src.empty()) return std::wstring{};
+                // Convert UTF-8 to wide (UTF-16 on Windows)
+                int size_needed = MultiByteToWideChar(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), nullptr, 0);
+                if (size_needed <= 0) return std::wstring{};
+                std::wstring result;
+                result.resize(size_needed);
+                MultiByteToWideChar(CP_UTF8, 0, src.data(), static_cast<int>(src.size()), result.data(), size_needed);
+                return result;
+#else
                 std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
                 return converter.from_bytes(src);
+#endif
             }
 
             // We should not end up here!
