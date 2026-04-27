@@ -59,12 +59,12 @@ stages:
     - task: NuGetToolInstaller@1
       displayName: 'Install Nuget'
       inputs:
-        versionSpec: '6.1'
+        versionSpec: '6.x'
         checkLatest: true
 
     - task: gitversion-setup@4
       inputs:
-        versionSpec: '6.0'
+        versionSpec: '6.x'
 
     - task: gitversion-execute@4
       displayName: 'Determine Version..'
@@ -163,7 +163,7 @@ stages:
     - task: gitversion-setup@4
       displayName: 'Install GitVersion..'
       inputs:
-        versionSpec: '6.0'
+        versionSpec: '6.x'
         preferLatestVersion: true
 
     - task: gitversion-execute@4
@@ -185,7 +185,7 @@ stages:
         command: 'pack'
         packagesToPack: 'pack/*.nuspec'
         versioningScheme: 'off'
-        buildProperties: 'VERSION=$(GitVersion.MajorMinorPatch)'
+        buildProperties: 'VERSION=$(GITVERSION_MAJORMINORPATCH)'
       condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Windows'))
 
     - task: NuGetCommand@2
@@ -205,8 +205,8 @@ stages:
         action: 'create'
         target: '$(Build.SourceVersion)'
         tagSource: 'userSpecifiedTag'
-        tag: '$(GitVersion.MajorMinorPatch)'
-        title: 'v$(GitVersion.MajorMinorPatch)'
+        tag: '$(GGITVERSION_MAJORMINORPATCH)'
+        title: 'v$(GITVERSION_MAJORMINORPATCH)'
         releaseNotesSource: 'inline'
         releaseNotesInline: 'Documentation https://github.com/$(Build.Repository.Name)'
         isPreRelease: true

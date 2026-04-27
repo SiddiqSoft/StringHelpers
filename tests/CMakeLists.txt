@@ -5,7 +5,8 @@ if(${${PROJECT_NAME}_BUILD_TESTS})
     target_compile_features(${TESTPROJ} PRIVATE cxx_std_20)
     target_compile_options( ${TESTPROJ}
                             PRIVATE
-                            $<$<CXX_COMPILER_ID:MSVC>:/std:c++20> )
+                            $<$<CXX_COMPILER_ID:MSVC>:/std:c++20>
+                            $<$<CXX_COMPILER_ID:MSVC>:/utf-8> )
     target_sources( ${TESTPROJ}
                     PRIVATE
                     ${PROJECT_SOURCE_DIR}/tests/test.cpp)

@@ -119,7 +119,7 @@ namespace siddiqsoft
     {
 #if defined(WIN32)
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
-        std::string  sample_0rt {"Hello, ä¸\x96ç\x95\x8c"};
+        std::string  sample_0rt {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
         std::wstring sample_w {L"Hello, 世界"};
 #elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
@@ -472,6 +472,270 @@ namespace siddiqsoft
         std::string src {"hello"};
         auto result = ConversionUtils::convert_to(src);
         EXPECT_EQ(L"hello", result);
+    }
+
+    // =========================================================================
+    // Additional edge case and coverage tests
+    // =========================================================================
+
+    // Test with Hebrew script
+    TEST(ConversionUtils, hebrew_roundtrip)
+    {
+        std::string src {"\xD7\x9E\xD7\x95\xD7\xA9\xD7\x94"};  // "משה" (Moses)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with Greek script
+    TEST(ConversionUtils, greek_roundtrip)
+    {
+        std::string src {"\xCE\x95\xCE\xBB\xCE\xBB\xCE\xAC\xCE\xB4\xCE\xB1"};  // "Ελλάδα" (Greece)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with Devanagari script (Hindi)
+    TEST(ConversionUtils, devanagari_roundtrip)
+    {
+        std::string src {"\xE0\xA4\xA8\xE0\xA4\xAE\xE0\xA4\xB8\xE0\xA5\x8D\xE0\xA4\xA4\xE0\xA5\x87"};  // "नमस्ते" (Hello in Hindi)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with Arabic script
+    TEST(ConversionUtils, arabic_roundtrip)
+    {
+        std::string src {"\xD9\x85\xD8\xB1\xD8\xAD\xD8\xA8\xD8\xA7"};  // "مرحبا" (Hello in Arabic)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with Vietnamese (combining diacritics)
+    TEST(ConversionUtils, vietnamese_roundtrip)
+    {
+        std::string src {"\xE1\xBB\x8F"};  // "ỏ" (Vietnamese character with combining marks)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test multiple consecutive conversions (char -> wide -> char -> wide)
+    TEST(ConversionUtils, multiple_consecutive_conversions)
+    {
+        std::string original {"Hello, 世界"};
+        auto wide1   = ConversionUtils::convert_to<char, wchar_t>(original);
+        auto narrow1 = ConversionUtils::convert_to<wchar_t, char>(wide1);
+        auto wide2   = ConversionUtils::convert_to<char, wchar_t>(narrow1);
+        auto narrow2 = ConversionUtils::convert_to<wchar_t, char>(wide2);
+        EXPECT_EQ(original, narrow2);
+    }
+
+    // Test with newlines and carriage returns mixed with Unicode
+    TEST(ConversionUtils, unicode_with_line_endings)
+    {
+        std::string src {"Line1: \xE4\xB8\x96\r\nLine2: \xE7\x95\x8C"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with tabs and Unicode
+    TEST(ConversionUtils, unicode_with_tabs)
+    {
+        std::string src {"\xE4\xB8\x96\t\xE7\x95\x8C\t\xE6\x97\xA5"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with leading and trailing spaces
+    TEST(ConversionUtils, unicode_with_leading_trailing_spaces)
+    {
+        std::string src {"   \xE4\xB8\x96\xE7\x95\x8C   "};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with only whitespace characters
+    TEST(ConversionUtils, only_whitespace_roundtrip)
+    {
+        std::string src {" \t\n\r\v\f"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with repeated Unicode characters
+    TEST(ConversionUtils, repeated_unicode_chars)
+    {
+        std::string unit {"\xE4\xB8\x96"};  // Single CJK character
+        std::string src;
+        for (int i = 0; i < 100; ++i) src += unit;
+        auto wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+        EXPECT_EQ(100u, wide.size());
+    }
+
+    // Test with alternating ASCII and Unicode
+    TEST(ConversionUtils, alternating_ascii_unicode)
+    {
+        std::string src {"A\xE4\xB8\x96" "B\xE7\x95\x8C" "C\xE6\x97\xA5" "D"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with all ASCII printable characters
+    TEST(ConversionUtils, all_ascii_printable)
+    {
+        std::string src;
+        for (char c = 32; c < 127; ++c) src += c;
+        auto wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with single byte UTF-8 (ASCII range)
+    TEST(ConversionUtils, single_byte_utf8_range)
+    {
+        std::string src {"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"};
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with mixed 2-byte UTF-8 sequences
+    TEST(ConversionUtils, multiple_2byte_utf8)
+    {
+        std::string src {"\xC3\xA9\xC3\xA0\xC3\xBC\xC3\xB1"};  // é, à, ü, ñ
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with mixed 3-byte UTF-8 sequences
+    TEST(ConversionUtils, multiple_3byte_utf8)
+    {
+        std::string src {"\xE4\xB8\x96\xE7\x95\x8C\xE6\x97\xA5\xE6\x9C\xAC"};  // Multiple CJK chars
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with mixed 4-byte UTF-8 sequences (emojis)
+    TEST(ConversionUtils, multiple_4byte_utf8_emojis)
+    {
+        std::string src {"\xF0\x9F\x98\x80\xF0\x9F\x98\x81\xF0\x9F\x98\x82"};  // 😀😁😂
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with very long string (stress test)
+    TEST(ConversionUtils, very_long_string)
+    {
+        std::string src;
+        src.reserve(100000);
+        for (int i = 0; i < 10000; ++i) {
+            src += "Hello ";
+            src += "\xE4\xB8\x96";  // Add CJK character
+        }
+        auto wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test wide string with various Unicode characters
+    TEST(ConversionUtils, wide_string_mixed_unicode)
+    {
+        std::wstring src {L"Hello \x4E16\x754C \x00E9\x00E0\x00FC"};  // Hello 世界 éàü
+        auto         narrow = ConversionUtils::convert_to<wchar_t, char>(src);
+        auto         wide   = ConversionUtils::convert_to<char, wchar_t>(narrow);
+        EXPECT_EQ(src, wide);
+    }
+
+    // Test single character conversions for various Unicode blocks
+    TEST(ConversionUtils, single_char_various_blocks)
+    {
+        // Test single characters from different Unicode blocks
+        std::string chars[] = {
+            "\xC2\xA9",  // © (copyright sign)
+            "\xE2\x82\xAC",  // € (euro sign)
+            "\xE2\x98\x85",  // ★ (star)
+            "\xF0\x9F\x8C\x8D"  // 🌍 (earth globe)
+        };
+        
+        for (const auto& ch : chars) {
+            auto wide   = ConversionUtils::convert_to<char, wchar_t>(ch);
+            auto narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+            EXPECT_EQ(ch, narrow);
+        }
+    }
+
+    // Test that size is preserved for ASCII
+    TEST(ConversionUtils, ascii_size_preservation)
+    {
+        std::string src {"The quick brown fox jumps over the lazy dog. 1234567890!@#$%^&*()"};
+        auto        wide = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_EQ(src.size(), wide.size());
+    }
+
+    // Test that wide string size is correct for Unicode
+    TEST(ConversionUtils, wide_size_for_unicode)
+    {
+        std::string src {"\xE4\xB8\x96\xE7\x95\x8C"};  // 2 CJK characters (6 bytes in UTF-8)
+        auto        wide = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_EQ(2u, wide.size());  // Should be 2 wide characters
+    }
+
+    // Test conversion preserves character boundaries
+    TEST(ConversionUtils, character_boundary_preservation)
+    {
+        std::string src {"A\xC3\xA9" "B\xE4\xB8\x96" "C"};  // A + é + B + 世 + C
+        auto        wide = ConversionUtils::convert_to<char, wchar_t>(src);
+        EXPECT_EQ(5u, wide.size());  // A, é, B, 世, C = 5 characters
+    }
+
+    // Test with combining characters (if supported)
+    TEST(ConversionUtils, combining_characters)
+    {
+        std::string src {"e\xCC\x81"};  // e + combining acute accent = é
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test round-trip with special mathematical symbols
+    TEST(ConversionUtils, mathematical_symbols)
+    {
+        std::string src {"\xE2\x88\x80\xE2\x88\x83\xE2\x88\x88"};  // ∀∃∈ (for all, exists, element of)
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with currency symbols
+    TEST(ConversionUtils, currency_symbols)
+    {
+        std::string src {"\xC2\xA2\xC2\xA3\xC2\xA4\xC2\xA5\xE2\x82\xAC"};  // ¢£¤¥€
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
+    }
+
+    // Test with arrows and geometric shapes
+    TEST(ConversionUtils, arrows_and_shapes)
+    {
+        std::string src {"\xE2\x86\x90\xE2\x86\x91\xE2\x86\x92\xE2\x86\x93"};  // ←↑→↓
+        auto        wide   = ConversionUtils::convert_to<char, wchar_t>(src);
+        auto        narrow = ConversionUtils::convert_to<wchar_t, char>(wide);
+        EXPECT_EQ(src, narrow);
     }
 
 } // namespace siddiqsoft
