@@ -75,15 +75,15 @@ stages:
 
     # Set the flags for testing, build here.
     - task: CMake@1
-      displayName: 'CMake Configure $(cmake.preset)'
+      displayName: 'CMake Configure $(cmake.preset) $(GITVERSION_MAJORMINORPATCH)'
       inputs:
-        cmakeArgs: '--preset $(cmake.preset) -DCI_BUILDID=$(GitVersion.MajorMinorPatch) -DCPM_SOURCE_CACHE=$(Agent.HomeDirectory)/.cpmcache'
+        cmakeArgs: '--preset $(cmake.preset) -DCI_BUILDID=$(GITVERSION_MAJORMINORPATCH) -DCPM_SOURCE_CACHE=$(Agent.HomeDirectory)/.cpmcache'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
 
     - task: CMake@1
       displayName: 'CMake Build $(cmake.preset)'
       inputs:
-        cmakeArgs: '--build --preset $(cmake.preset) -DCI_BUILDID=$(GitVersion.MajorMinorPatch) -DCPM_SOURCE_CACHE=$(Agent.HomeDirectory)/.cpmcache'
+        cmakeArgs: '--build --preset $(cmake.preset) -DCI_BUILDID=$(GITVERSION_MAJORMINORPATCH) -DCPM_SOURCE_CACHE=$(Agent.HomeDirectory)/.cpmcache'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
       condition: succeeded()
 
@@ -185,7 +185,7 @@ stages:
         command: 'pack'
         packagesToPack: 'pack/*.nuspec'
         versioningScheme: 'off'
-        buildProperties: 'VERSION=$(GitVersion.MajorMinorPatch)'
+        buildProperties: 'VERSION=$(GITVERSION_MAJORMINORPATCH)'
       condition: and(succeeded(), startsWith(variables['Agent.OS'], 'Windows'))
 
     - task: NuGetCommand@2
@@ -205,8 +205,8 @@ stages:
         action: 'create'
         target: '$(Build.SourceVersion)'
         tagSource: 'userSpecifiedTag'
-        tag: '$(GitVersion.MajorMinorPatch)'
-        title: 'v$(GitVersion.MajorMinorPatch)'
+        tag: '$(GITVERSION_MAJORMINORPATCH)'
+        title: 'v$(GITVERSION_MAJORMINORPATCH)'
         releaseNotesSource: 'inline'
         releaseNotesInline: 'Documentation https://github.com/$(Build.Repository.Name)'
         isPreRelease: true
