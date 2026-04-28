@@ -98,15 +98,18 @@ namespace siddiqsoft
         // The reason we do not get sample == sample is due to the idiosyncracy of the
         // various platforms and their encoding scheme. Notably Apple and Windows/Linux differ
         // in their textual encoding.
-        // In order to prevent constant mutation by git we're using the raw form.
-        std::wstring sample {L"صديق"};
+        // Using Unicode code points to ensure consistent behavior across platforms
+        // صديق = U+0635 U+062F U+064A U+0642
+        std::string  sample {"صديق"};
+        std::wstring sample_w {L"\x0635\x062F\x064A\x0642"};
         std::string sample_n {"\xD8\xB5\xD8\xAF\xD9\x8A\xD9\x82"};
 
         try {
-            auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample);
+            auto intermediate = ConversionUtils::convert_to<wchar_t, char>(sample_w);
             EXPECT_EQ(sample_n, intermediate);
             auto roundTrip = ConversionUtils::convert_to<char, wchar_t>(intermediate);
-            EXPECT_EQ(sample, roundTrip);
+            EXPECT_EQ(sample_w, roundTrip);
+            EXPECT_EQ(sample, intermediate);
         }
         catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
@@ -119,8 +122,9 @@ namespace siddiqsoft
     {
 #if defined(WIN32)
         std::string  sample_0 {"\x48\x65\x6c\x6c\x6f\x2c\x20\xe4\xb8\x96\xe7\x95\x8c"};
-        std::string  sample_0rt {"Hello, ä¸\x96ç\x95\x8c"};
-        std::wstring sample_w {L"Hello, 世界"};
+        std::string  sample_0rt {"Hello, \xE4\xB8\x96\xE7\x95\x8C"};
+        // Using Unicode code points for wide string: 世 = U+4E16, 界 = U+754C
+        std::wstring sample_w {L"Hello, \x4E16\x754C"};
 #elif defined(__APPLE__)
         std::string  sample_0 {"Banc\xC3\xA9"};
         std::string  sample_0rt {"Bancé"};
